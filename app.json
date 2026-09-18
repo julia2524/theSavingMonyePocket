@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "theSavingMoneyPocket",
+    "slug": "theSavingMoneyPocket",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.julia2524.theSavingMoneyPocket"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
+      "package": "com.julia2524.theSavingMoneyPocket"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-ocr-kit",
+        {
+          "cameraPermission": "사진을 촬영하여 글자를 인식하는 데 사용합니다."
+        }
+      ]
+    ]
+  }
+}
