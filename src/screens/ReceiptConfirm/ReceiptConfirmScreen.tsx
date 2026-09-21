@@ -19,8 +19,14 @@ import {
   AmountText,
 } from "../../design-system/components";
 import CustomCalendar from "../../design-system/components/CustomCalendar";
+import { ExpenseCategory, saveExpense } from "../../data/expenseStorage";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/types";
 
 export default function ReceiptConfirmScreen() {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [imageUri, setImageUri] = useState<string | null>(null);
 
   // 개발 중 OCR 원본 확인용
@@ -33,7 +39,8 @@ export default function ReceiptConfirmScreen() {
   const [editableData, setEditableData] = useState<ParsedReceipt | null>(null);
 
   // 카테고리 (기본값: food)
-  const [selectedCategory, setSelectedCategory] = useState<string>("food");
+  const [selectedCategory, setSelectedCategory] =
+    useState<ExpenseCategory>("food");
 
   // -----------------------------
   // 📅 달력 모달 상태
@@ -163,20 +170,42 @@ export default function ReceiptConfirmScreen() {
   // 저장
   // -----------------------------
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!editableData) return;
 
-    console.log("💾 FINAL EXPENSE DATA:", {
-      ...editableData,
-      category: selectedCategory,
-    });
+    if (!editableData.totalAmount) {
+      Alert.alert("금액을 확인해주세요");
+      return;
+    }
 
-    Alert.alert(
-      "저장 완료",
-      `${editableData.storeName || "상호명 없음"}\n${
-        editableData.totalAmount?.toLocaleString() || "0"
-      }원`,
-    );
+    const expense = {
+      id: `expense_${Date.now()}`,
+      storeName: editableData.storeName ?? "상호명 없음",
+      date: editableData.possibleDate ?? "",
+      totalAmount: editableData.totalAmount,
+      category: selectedCategory,
+      receiptImageUri: imageUri ?? undefined,
+      createdAt: new Date().toISOString(),
+    };
+
+    try {
+      await saveExpense(expense);
+
+      Alert.alert("저장 완료", "지출 내역이 기록되었어!", [
+        {
+          text: "확인",
+          onPress: () => {
+            navigation.navigate("MainTabs", {
+              screen: "ExpenseList",
+            });
+          },
+        },
+      ]);
+
+      console.log("💾 SAVED EXPENSE:", expense);
+    } catch (error) {
+      Alert.alert("저장 실패", "지출 내역을 저장하지 못했어.");
+    }
   };
 
   return (
