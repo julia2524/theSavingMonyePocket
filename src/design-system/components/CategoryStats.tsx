@@ -3,6 +3,7 @@ import styled, { useTheme } from "styled-components/native";
 import { Expense, ExpenseCategory } from "../../data/expenseStorage";
 import { AppCard } from "./AppCard";
 import { AmountText } from "./AmountText";
+import { Ionicons } from "@expo/vector-icons";
 
 interface CategoryStatsProps {
   expenses: Expense[];
@@ -81,8 +82,10 @@ export default function CategoryStats({ expenses }: CategoryStatsProps) {
 
   return (
     <Container>
-      <SectionTitle>📊 이번 달 카테고리별 지출</SectionTitle>
-
+      <SectionTitleContainer>
+        <Ionicons name="stats-chart" size={20} color={theme.colors.primary} />
+        <SectionTitle>이번 달 카테고리별 지출</SectionTitle>
+      </SectionTitleContainer>
       <AppCard>
         <StatsContainer>
           {categoryStats.map((item) => (
@@ -111,12 +114,18 @@ export default function CategoryStats({ expenses }: CategoryStatsProps) {
 const Container = styled.View`
   margin-bottom: 20px;
 `;
+// Styled Components
+const SectionTitleContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: ${({ theme }) => theme.spacing.md}px;
+`;
 
 const SectionTitle = styled.Text`
-  font-size: 18px;
-  font-weight: 700;
-  color: #202522;
-  margin-bottom: 12px;
+  color: ${({ theme }) => theme.colors.textPrimary};
+  font-size: ${({ theme }) => theme.typography.fontSize.lg}px;
+  font-family: ${({ theme }) => theme.typography.fontFamily.bold};
 `;
 
 const StatsContainer = styled.View`

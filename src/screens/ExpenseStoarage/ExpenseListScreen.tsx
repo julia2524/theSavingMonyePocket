@@ -1,7 +1,286 @@
+// import React, { useCallback, useMemo, useState } from "react";
+// import { FlatList } from "react-native";
+// import { useFocusEffect } from "@react-navigation/native";
+// import styled from "styled-components/native";
+
+// import {
+//   AppCard,
+//   AmountText,
+//   CategoryChip,
+// } from "../../design-system/components";
+
+// import {
+//   Expense,
+//   ExpenseCategory,
+//   getExpenses,
+// } from "../../data/expenseStorage";
+
+// export default function ExpenseListScreen() {
+//   const [expenses, setExpenses] = useState<Expense[]>([]);
+
+//   const loadExpenses = async () => {
+//     const data = await getExpenses();
+//     console.log("📋 저장된 지출:", data);
+//     setExpenses(data);
+//   };
+
+//   useFocusEffect(
+//     useCallback(() => {
+//       loadExpenses();
+//     }, []),
+//   );
+
+//   // -----------------------------
+//   // 이번 달 지출
+//   // -----------------------------
+//   const currentMonthTotal = useMemo(() => {
+//     const now = new Date();
+//     const year = now.getFullYear();
+//     const month = now.getMonth() + 1;
+
+//     return expenses
+//       .filter((expense) => {
+//         const [expenseYear, expenseMonth] = expense.date.split(".").map(Number);
+
+//         return expenseYear === year && expenseMonth === month;
+//       })
+//       .reduce((total, expense) => total + expense.totalAmount, 0);
+//   }, [expenses]);
+
+//   // -----------------------------
+//   // 날짜별 그룹
+//   // -----------------------------
+
+//   const groupedExpenses = useMemo(() => {
+//     const groups: Record<string, Expense[]> = {};
+
+//     expenses.forEach((expense) => {
+//       if (!groups[expense.date]) {
+//         groups[expense.date] = [];
+//       }
+
+//       groups[expense.date].push(expense);
+//     });
+
+//     return Object.entries(groups)
+//       .sort(([dateA], [dateB]) => dateB.localeCompare(dateA))
+//       .flatMap(([date, items]) => [
+//         {
+//           type: "date" as const,
+//           id: `date-${date}`,
+//           date,
+//         },
+//         ...items.map((expense) => ({
+//           type: "expense" as const,
+//           id: expense.id,
+//           expense,
+//         })),
+//       ]);
+//   }, [expenses]);
+
+//   return (
+//     <Screen>
+//       <Header>
+//         <HeaderTitle>지출 기록</HeaderTitle>
+//       </Header>
+
+//       <SummaryCard>
+//         <SummaryLabel>이번 달 지출</SummaryLabel>
+
+//         <AmountText amount={currentMonthTotal} size="large" color="#176B5B" />
+//       </SummaryCard>
+
+//       {expenses.length === 0 ? (
+//         <EmptyContainer>
+//           <EmptyIcon>🧾</EmptyIcon>
+
+//           <EmptyTitle>아직 기록된 지출이 없어요</EmptyTitle>
+
+//           <EmptyDescription>
+//             영수증을 등록하면{"\n"}
+//             여기에 지출 기록이 쌓여요.
+//           </EmptyDescription>
+//         </EmptyContainer>
+//       ) : (
+//         <FlatList
+//           data={groupedExpenses}
+//           keyExtractor={(item) => item.id}
+//           contentContainerStyle={{
+//             paddingHorizontal: 20,
+//             paddingBottom: 40,
+//           }}
+//           showsVerticalScrollIndicator={false}
+//           renderItem={({ item }) => {
+//             if (item.type === "date") {
+//               return <DateHeader>{formatDate(item.date)}</DateHeader>;
+//             }
+
+//             return (
+//               <ExpenseCard>
+//                 <ExpenseInfo>
+//                   <StoreName>{item.expense.storeName}</StoreName>
+
+//                   <CategoryChip
+//                     category={item.expense.category}
+//                     label={getCategoryLabel(item.expense.category)}
+//                     selected={false}
+//                     onPress={() => {}}
+//                   />
+//                 </ExpenseInfo>
+
+//                 <AmountText
+//                   amount={item.expense.totalAmount}
+//                   size="medium"
+//                   color="#202522"
+//                 />
+//               </ExpenseCard>
+//             );
+//           }}
+//         />
+//       )}
+//     </Screen>
+//   );
+// }
+
+// // =========================================================
+// // Helpers
+// // =========================================================
+// function formatDate(date: string) {
+//   if (!date) return "날짜 없음";
+
+//   const parts = date.split(".");
+
+//   if (parts.length !== 3) {
+//     return date;
+//   }
+
+//   return `${Number(parts[1])}월 ${Number(parts[2])}일`;
+// }
+
+// function getCategoryLabel(category: ExpenseCategory) {
+//   const labels: Record<ExpenseCategory, string> = {
+//     food: "식비",
+//     living: "생활",
+//     shopping: "쇼핑",
+//     transport: "교통",
+//     medical: "의료",
+//     education: "교육",
+//     cafe: "카페/외식",
+//     leisure: "여가",
+//     beauty: "미용",
+//     etc: "기타",
+//   };
+
+//   return labels[category];
+// }
+
+// // =========================================================
+// // Styled Components
+// // =========================================================
+
+// const Screen = styled.View`
+//   flex: 1;
+//   background-color: ${({ theme }) => theme.colors.background};
+// `;
+
+// const Header = styled.View`
+//   padding: 24px 20px 16px;
+// `;
+
+// const HeaderTitle = styled.Text`
+//   color: ${({ theme }) => theme.colors.textPrimary};
+
+//   font-size: ${({ theme }) => theme.typography.fontSize.xxl}px;
+
+//   font-family: ${({ theme }) => theme.typography.fontFamily.bold};
+// `;
+
+// const SummaryCard = styled(AppCard)`
+//   margin: 0 20px 24px;
+// `;
+
+// const SummaryLabel = styled.Text`
+//   margin-bottom: 8px;
+
+//   color: ${({ theme }) => theme.colors.textSecondary};
+
+//   font-size: ${({ theme }) => theme.typography.fontSize.sm}px;
+
+//   font-family: ${({ theme }) => theme.typography.fontFamily.medium};
+// `;
+
+// const DateHeader = styled.Text`
+//   margin-top: 12px;
+//   margin-bottom: 10px;
+
+//   color: ${({ theme }) => theme.colors.textSecondary};
+
+//   font-size: ${({ theme }) => theme.typography.fontSize.sm}px;
+
+//   font-family: ${({ theme }) => theme.typography.fontFamily.semiBold};
+// `;
+
+// const ExpenseCard = styled(AppCard)`
+//   margin-bottom: 10px;
+
+//   flex-direction: row;
+//   align-items: center;
+//   justify-content: space-between;
+// `;
+
+// const ExpenseInfo = styled.View`
+//   flex: 1;
+//   gap: 8px;
+// `;
+
+// const StoreName = styled.Text`
+//   color: ${({ theme }) => theme.colors.textPrimary};
+
+//   font-size: ${({ theme }) => theme.typography.fontSize.md}px;
+
+//   font-family: ${({ theme }) => theme.typography.fontFamily.semiBold};
+// `;
+
+// const EmptyContainer = styled.View`
+//   flex: 1;
+
+//   align-items: center;
+//   justify-content: center;
+
+//   padding: 40px 20px;
+// `;
+
+// const EmptyIcon = styled.Text`
+//   margin-bottom: 16px;
+//   font-size: 48px;
+// `;
+
+// const EmptyTitle = styled.Text`
+//   margin-bottom: 8px;
+
+//   color: ${({ theme }) => theme.colors.textPrimary};
+
+//   font-size: ${({ theme }) => theme.typography.fontSize.lg}px;
+
+//   font-family: ${({ theme }) => theme.typography.fontFamily.semiBold};
+// `;
+
+// const EmptyDescription = styled.Text`
+//   text-align: center;
+
+//   color: ${({ theme }) => theme.colors.textSecondary};
+
+//   font-size: ${({ theme }) => theme.typography.fontSize.sm}px;
+
+//   line-height: 22px;
+
+//   font-family: ${({ theme }) => theme.typography.fontFamily.regular};
+// `;
+
 import React, { useCallback, useMemo, useState } from "react";
-import { FlatList } from "react-native";
+import { FlatList, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import styled from "styled-components/native";
+import styled, { useTheme } from "styled-components/native";
 
 import {
   AppCard,
@@ -14,13 +293,14 @@ import {
   ExpenseCategory,
   getExpenses,
 } from "../../data/expenseStorage";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function ExpenseListScreen() {
+  const theme = useTheme();
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
   const loadExpenses = async () => {
     const data = await getExpenses();
-    console.log("📋 저장된 지출:", data);
     setExpenses(data);
   };
 
@@ -40,7 +320,12 @@ export default function ExpenseListScreen() {
 
     return expenses
       .filter((expense) => {
-        const [expenseYear, expenseMonth] = expense.date.split(".").map(Number);
+        if (!expense.date) return false;
+        // '.'과 '-' 구분자 모두 대응
+        const [expenseYear, expenseMonth] = expense.date
+          .replace(/\./g, "-")
+          .split("-")
+          .map(Number);
 
         return expenseYear === year && expenseMonth === month;
       })
@@ -48,9 +333,8 @@ export default function ExpenseListScreen() {
   }, [expenses]);
 
   // -----------------------------
-  // 날짜별 그룹
+  // 날짜별 그룹화
   // -----------------------------
-
   const groupedExpenses = useMemo(() => {
     const groups: Record<string, Expense[]> = {};
 
@@ -58,7 +342,6 @@ export default function ExpenseListScreen() {
       if (!groups[expense.date]) {
         groups[expense.date] = [];
       }
-
       groups[expense.date].push(expense);
     });
 
@@ -80,64 +363,84 @@ export default function ExpenseListScreen() {
 
   return (
     <Screen>
-      <Header>
-        <HeaderTitle>지출 기록</HeaderTitle>
-      </Header>
+      <FlatList
+        data={groupedExpenses}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 16,
+          paddingBottom: 40,
+        }}
+        // 카드 간격 보장 (찌그러짐 방지)
+        ItemSeparatorComponent={() => <CardGap />}
+        ListHeaderComponent={
+          <>
+            <Header>
+              <HeaderTitle>지출 기록</HeaderTitle>
+            </Header>
 
-      <SummaryCard>
-        <SummaryLabel>이번 달 지출</SummaryLabel>
+            {/* HomeScreen과 통일된 하이라이트 카드 */}
+            <HighlightCard>
+              <SummaryLabel>이번 달 지출 총액</SummaryLabel>
+              <AmountText
+                amount={currentMonthTotal}
+                size="hero"
+                color={theme.colors.primary}
+              />
+              <SummarySubText>
+                {new Date().getMonth() + 1}월에 사용한 금액이에요
+              </SummarySubText>
+            </HighlightCard>
+          </>
+        }
+        renderItem={({ item }) => {
+          if (item.type === "date") {
+            return <DateHeader>{formatDate(item.date)}</DateHeader>;
+          }
 
-        <AmountText amount={currentMonthTotal} size="large" color="#176B5B" />
-      </SummaryCard>
-
-      {expenses.length === 0 ? (
-        <EmptyContainer>
-          <EmptyIcon>🧾</EmptyIcon>
-
-          <EmptyTitle>아직 기록된 지출이 없어요</EmptyTitle>
-
-          <EmptyDescription>
-            영수증을 등록하면{"\n"}
-            여기에 지출 기록이 쌓여요.
-          </EmptyDescription>
-        </EmptyContainer>
-      ) : (
-        <FlatList
-          data={groupedExpenses}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{
-            paddingHorizontal: 20,
-            paddingBottom: 40,
-          }}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => {
-            if (item.type === "date") {
-              return <DateHeader>{formatDate(item.date)}</DateHeader>;
-            }
-
-            return (
-              <ExpenseCard>
-                <ExpenseInfo>
-                  <StoreName>{item.expense.storeName}</StoreName>
-
+          return (
+            <ExpenseCard>
+              <ExpenseMainContainer>
+                {/* 상단: 카테고리 칩 + 날짜 */}
+                <ExpenseHeaderRow>
                   <CategoryChip
                     category={item.expense.category}
                     label={getCategoryLabel(item.expense.category)}
                     selected={false}
-                    onPress={() => {}}
                   />
-                </ExpenseInfo>
+                  <DateText>{formatDate(item.expense.date)}</DateText>
+                </ExpenseHeaderRow>
 
-                <AmountText
-                  amount={item.expense.totalAmount}
-                  size="medium"
-                  color="#202522"
-                />
-              </ExpenseCard>
-            );
-          }}
-        />
-      )}
+                {/* 하단: 상호명(왼쪽) + 금액(오른쪽) */}
+                <ExpenseBodyRow>
+                  <StoreName numberOfLines={1}>
+                    {item.expense.storeName || "상호명 없음"}
+                  </StoreName>
+                  <ExpenseAmount>
+                    {item.expense.totalAmount.toLocaleString()}원
+                  </ExpenseAmount>
+                </ExpenseBodyRow>
+              </ExpenseMainContainer>
+            </ExpenseCard>
+          );
+        }}
+        ListEmptyComponent={
+          <EmptyCard>
+            <EmptyIconContainer>
+              <Ionicons
+                name="document-text-outline"
+                size={48}
+                color={theme.colors.textTertiary}
+              />
+            </EmptyIconContainer>
+            <EmptyTitle>아직 기록된 지출이 없어요</EmptyTitle>
+            <EmptyDescription>
+              영수증을 등록하면{"\n"}여기에 지출 기록이 쌓여요.
+            </EmptyDescription>
+          </EmptyCard>
+        }
+      />
     </Screen>
   );
 }
@@ -145,16 +448,13 @@ export default function ExpenseListScreen() {
 // =========================================================
 // Helpers
 // =========================================================
+
 function formatDate(date: string) {
-  if (!date) return "날짜 없음";
-
-  const parts = date.split(".");
-
-  if (parts.length !== 3) {
-    return date;
-  }
-
-  return `${Number(parts[1])}월 ${Number(parts[2])}일`;
+  if (!date) return "";
+  const cleanDate = date.replace(/\./g, "-");
+  const [year, month, day] = cleanDate.split("-").map(Number);
+  if (!year || !month || !day) return date;
+  return `${month}월 ${day}일`;
 }
 
 function getCategoryLabel(category: ExpenseCategory) {
@@ -170,8 +470,7 @@ function getCategoryLabel(category: ExpenseCategory) {
     beauty: "미용",
     etc: "기타",
   };
-
-  return labels[category];
+  return labels[category] || "기타";
 }
 
 // =========================================================
@@ -184,95 +483,129 @@ const Screen = styled.View`
 `;
 
 const Header = styled.View`
-  padding: 24px 20px 16px;
+  margin-bottom: ${({ theme }) => theme.spacing.lg}px;
 `;
 
 const HeaderTitle = styled.Text`
   color: ${({ theme }) => theme.colors.textPrimary};
-
   font-size: ${({ theme }) => theme.typography.fontSize.xxl}px;
-
   font-family: ${({ theme }) => theme.typography.fontFamily.bold};
 `;
 
-const SummaryCard = styled(AppCard)`
-  margin: 0 20px 24px;
+const HighlightCard = styled.View`
+  width: 100%;
+  padding: ${({ theme }) => theme.spacing.xl}px;
+  border-radius: ${({ theme }) => theme.radius.xl}px;
+  background-color: ${({ theme }) => theme.colors.background};
+  margin-bottom: ${({ theme }) => theme.spacing.lg}px;
+
+  /* iOS 그림자 */
+  shadow-color: ${({ theme }) => theme.colors.primary};
+  shadow-opacity: 0.15;
+  shadow-radius: 10px;
+  elevation: 3;
 `;
 
 const SummaryLabel = styled.Text`
-  margin-bottom: 8px;
-
-  color: ${({ theme }) => theme.colors.textSecondary};
-
+  margin-bottom: ${({ theme }) => theme.spacing.xs}px;
+  color: ${({ theme }) => theme.colors.primary};
   font-size: ${({ theme }) => theme.typography.fontSize.sm}px;
-
   font-family: ${({ theme }) => theme.typography.fontFamily.medium};
 `;
 
+const SummarySubText = styled.Text`
+  margin-top: ${({ theme }) => theme.spacing.xs}px;
+  color: ${({ theme }) => theme.colors.primary};
+  font-size: ${({ theme }) => theme.typography.fontSize.xs}px;
+  font-family: ${({ theme }) => theme.typography.fontFamily.regular};
+`;
+
+/* 날짜 구분을 표시하는 헤더 */
 const DateHeader = styled.Text`
   margin-top: 12px;
-  margin-bottom: 10px;
-
+  margin-bottom: 8px;
   color: ${({ theme }) => theme.colors.textSecondary};
-
   font-size: ${({ theme }) => theme.typography.fontSize.sm}px;
+  font-family: ${({ theme }) => theme.typography.fontFamily.bold};
+`;
 
-  font-family: ${({ theme }) => theme.typography.fontFamily.semiBold};
+/* 카드 사이의 여백 전용 컴포넌트 */
+const CardGap = styled.View`
+  height: 12px;
 `;
 
 const ExpenseCard = styled(AppCard)`
-  margin-bottom: 10px;
+  width: 100%;
+  padding: 16px;
+  margin-bottom: 0px; /* ItemSeparatorComponent 사용으로 margin 제거 */
+`;
 
+const ExpenseMainContainer = styled.View`
+  width: 100%;
+`;
+
+const ExpenseHeaderRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+`;
+
+const ExpenseBodyRow = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 `;
 
-const ExpenseInfo = styled.View`
-  flex: 1;
-  gap: 8px;
-`;
-
 const StoreName = styled.Text`
+  flex: 1;
+  margin-right: 12px;
   color: ${({ theme }) => theme.colors.textPrimary};
-
   font-size: ${({ theme }) => theme.typography.fontSize.md}px;
-
   font-family: ${({ theme }) => theme.typography.fontFamily.semiBold};
 `;
 
-const EmptyContainer = styled.View`
-  flex: 1;
-
-  align-items: center;
-  justify-content: center;
-
-  padding: 40px 20px;
+const DateText = styled.Text`
+  color: ${({ theme }) => theme.colors.textTertiary};
+  font-size: ${({ theme }) => theme.typography.fontSize.xs}px;
+  font-family: ${({ theme }) => theme.typography.fontFamily.regular};
 `;
 
-const EmptyIcon = styled.Text`
-  margin-bottom: 16px;
-  font-size: 48px;
+const ExpenseAmount = styled.Text`
+  color: ${({ theme }) => theme.colors.textPrimary};
+  font-size: ${({ theme }) => theme.typography.fontSize.lg}px;
+  font-family: ${({ theme }) => theme.typography.fontFamily.bold};
+`;
+
+const EmptyCard = styled(AppCard)`
+  align-items: center;
+  justify-content: center;
+  padding: ${({ theme }) => theme.spacing.xxxl}px;
+  margin-top: 20px;
+`;
+
+const EmptyEmoji = styled.Text`
+  margin-bottom: ${({ theme }) => theme.spacing.md}px;
+  font-size: 40px;
 `;
 
 const EmptyTitle = styled.Text`
-  margin-bottom: 8px;
-
+  margin-bottom: ${({ theme }) => theme.spacing.xs}px;
   color: ${({ theme }) => theme.colors.textPrimary};
-
-  font-size: ${({ theme }) => theme.typography.fontSize.lg}px;
-
+  font-size: ${({ theme }) => theme.typography.fontSize.md}px;
   font-family: ${({ theme }) => theme.typography.fontFamily.semiBold};
 `;
 
 const EmptyDescription = styled.Text`
   text-align: center;
-
   color: ${({ theme }) => theme.colors.textSecondary};
-
   font-size: ${({ theme }) => theme.typography.fontSize.sm}px;
-
   line-height: 22px;
-
   font-family: ${({ theme }) => theme.typography.fontFamily.regular};
+`;
+
+const EmptyIconContainer = styled.View`
+  margin-bottom: ${({ theme }) => theme.spacing.md}px;
+  align-items: center;
+  justify-content: center;
 `;

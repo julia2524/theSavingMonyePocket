@@ -9,6 +9,7 @@ import HomeScreen from "../screens/Home/HomeScreen";
 // 🚨 경로 오타 수정됨! (ExpenseStoarage.ts -> expenseStorage 혹은 실제 위치)
 import ReceiptConfirmScreen from "../screens/ReceiptConfirm/ReceiptConfirmScreen";
 import ExpenseListScreen from "../screens/ExpenseStoarage/ExpenseListScreen";
+import { Ionicons } from "@expo/vector-icons";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const MainTab = createBottomTabNavigator<MainTabParamList>();
@@ -38,7 +39,13 @@ function MainTabs() {
             fontFamily: theme.typography.fontFamily.bold,
             color: theme.colors.textPrimary,
           },
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18 }}>🏠</Text>,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={size || 22}
+              color={color}
+            />
+          ),
         }}
       />
 
@@ -53,7 +60,13 @@ function MainTabs() {
             fontFamily: theme.typography.fontFamily.bold,
             color: theme.colors.textPrimary,
           },
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18 }}>📋</Text>,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "receipt" : "receipt-outline"}
+              size={size || 22}
+              color={color}
+            />
+          ),
         }}
       />
     </MainTab.Navigator>

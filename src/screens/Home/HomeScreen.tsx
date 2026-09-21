@@ -18,6 +18,7 @@ import {
 } from "../../data/expenseStorage";
 import { RootStackParamList } from "../../navigation/types";
 import CategoryStats from "../../design-system/components/CategoryStats";
+import { Ionicons } from "@expo/vector-icons";
 
 type HomeNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -105,7 +106,10 @@ export default function HomeScreen() {
 
             <ReceiptButtonSection>
               <AppButton
-                title="📷 영수증 촬영/기록하기"
+                title="영수증 촬영/기록하기"
+                icon={
+                  <Ionicons name="camera-outline" size={20} color="#FFFFFF" />
+                }
                 onPress={handleAddReceipt}
               />
             </ReceiptButtonSection>
@@ -150,7 +154,13 @@ export default function HomeScreen() {
         )}
         ListEmptyComponent={
           <EmptyCard>
-            <EmptyEmoji>🧾</EmptyEmoji>
+            <EmptyIconContainer>
+              <Ionicons
+                name="receipt-outline"
+                size={48}
+                color={theme.colors.textTertiary}
+              />
+            </EmptyIconContainer>
             <EmptyTitle>아직 기록된 지출이 없어요</EmptyTitle>
             <EmptyText>영수증을 찍어서 첫 번째 지출을 기록해보세요.</EmptyText>
           </EmptyCard>
@@ -340,4 +350,10 @@ const EmptyText = styled.Text`
   font-size: ${({ theme }) => theme.typography.fontSize.sm}px;
   text-align: center;
   font-family: ${({ theme }) => theme.typography.fontFamily.regular};
+`;
+
+const EmptyIconContainer = styled.View`
+  margin-bottom: ${({ theme }) => theme.spacing.md}px;
+  align-items: center;
+  justify-content: center;
 `;
