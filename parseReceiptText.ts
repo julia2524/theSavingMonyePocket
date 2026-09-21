@@ -22,7 +22,7 @@ export function parseReceiptText(rawText: string): ParsedReceipt {
     "포인트",
     "POINT",
     "잔여",
-    "적립",
+    "적립초", // "적립초과/한도" 등
     "TEL",
     "사업자",
     "NO",
@@ -30,7 +30,18 @@ export function parseReceiptText(rawText: string): ParsedReceipt {
   ];
 
   // 3. 우대 채택 키워드 (매출금액, 합계, 결제금액)
-  const targetKeywords = ["매출", "결제", "합계", "TOTAL", "AMOUNT"];
+  const targetKeywords = [
+    "매출",
+    "결제",
+    "합계",
+    "TOTAL",
+    "AMOUNT",
+    "승인금액",
+    "승인",
+  ];
+
+  // 3. 우대 채택 키워드 (매출금액, 합계, 결제금액) - 정규식으로 변경
+  const targetRegex = /(매출|결제|합계|TOTAL|AMOUNT|승인|승의)/i;
 
   let bestAmount: number | null = null;
   const candidateAmounts: number[] = [];
@@ -38,24 +49,44 @@ export function parseReceiptText(rawText: string): ParsedReceipt {
   lines.forEach((line) => {
     const upper = line.toUpperCase();
 
-    // 포인트나 전화번호 라인은 완전 제외
     if (excludeKeywords.some((key) => upper.includes(key))) {
       return;
     }
 
-    // B560 같은 OCR 깨짐 현상 보정 (B -> 8)
     const sanitizedLine = line.replace(/B(?=\d)/g, "8");
     const num = extractNumber(sanitizedLine);
 
     if (num && num >= 100 && num <= 5000000) {
       candidateAmounts.push(num);
 
-      // '매출' 또는 '합계' 관련 줄에 위치한 숫자 우선 선택
-      if (targetKeywords.some((key) => upper.includes(key)) && !bestAmount) {
+      // 기존: targetKeywords.some((key) => upper.includes(key))
+      // 변경: targetRegex.test(line) 로 교체
+      if (targetRegex.test(line) && !bestAmount) {
         bestAmount = num;
       }
     }
   });
+  // lines.forEach((line) => {
+  //   const upper = line.toUpperCase();
+
+  //   // 포인트나 전화번호 라인은 완전 제외
+  //   if (excludeKeywords.some((key) => upper.includes(key))) {
+  //     return;
+  //   }
+
+  //   // B560 같은 OCR 깨짐 현상 보정 (B -> 8)
+  //   const sanitizedLine = line.replace(/B(?=\d)/g, "8");
+  //   const num = extractNumber(sanitizedLine);
+
+  //   if (num && num >= 100 && num <= 5000000) {
+  //     candidateAmounts.push(num);
+
+  //     // '매출' 또는 '합계' 관련 줄에 위치한 숫자 우선 선택
+  //     if (targetKeywords.some((key) => upper.includes(key)) && !bestAmount) {
+  //       bestAmount = num;
+  //     }
+  //   }
+  // });
 
   // Target 키워드로 못 찾았으면 후보 중 상위 영역/최다 빈도값 채택
   if (!bestAmount && candidateAmounts.length > 0) {
@@ -270,10 +301,10 @@ function extractStoreNameGenerically(lines: string[]): string | null {
 }
 
 function extractNumber(text: string): number | null {
-  // 8.560 또는 8,560 패토
-  const match = text.match(/([1-9]\d{0,2}[.,]\d{3})/);
+  // 8.560, 8,560, 그리고 OCR에서 흔한 "8, 560" (쉼표 뒤 공백)까지 커버
+  const match = text.match(/([1-9]\d{0,2}[.,]\s?\d{3})/);
   if (match) {
-    return parseInt(match[1].replace(/[.,]/g, ""), 10);
+    return parseInt(match[1].replace(/[.,\s]/g, ""), 10);
   }
   return null;
 }

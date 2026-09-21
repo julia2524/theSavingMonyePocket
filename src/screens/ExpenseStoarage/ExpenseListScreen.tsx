@@ -20,6 +20,7 @@ export default function ExpenseListScreen() {
 
   const loadExpenses = async () => {
     const data = await getExpenses();
+    console.log("📋 저장된 지출:", data);
     setExpenses(data);
   };
 
@@ -32,16 +33,14 @@ export default function ExpenseListScreen() {
   // -----------------------------
   // 이번 달 지출
   // -----------------------------
-
   const currentMonthTotal = useMemo(() => {
     const now = new Date();
-
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
 
     return expenses
       .filter((expense) => {
-        const [expenseYear, expenseMonth] = expense.date.split("-").map(Number);
+        const [expenseYear, expenseMonth] = expense.date.split(".").map(Number);
 
         return expenseYear === year && expenseMonth === month;
       })
@@ -146,11 +145,10 @@ export default function ExpenseListScreen() {
 // =========================================================
 // Helpers
 // =========================================================
-
 function formatDate(date: string) {
   if (!date) return "날짜 없음";
 
-  const parts = date.split("-");
+  const parts = date.split(".");
 
   if (parts.length !== 3) {
     return date;

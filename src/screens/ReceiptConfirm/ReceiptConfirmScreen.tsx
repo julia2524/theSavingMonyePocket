@@ -181,10 +181,16 @@ export default function ReceiptConfirmScreen() {
     const expense = {
       id: `expense_${Date.now()}`,
       storeName: editableData.storeName ?? "상호명 없음",
-      date: editableData.possibleDate ?? "",
+
+      // 날짜가 없으면 오늘 날짜 사용
+      date: editableData.possibleDate || new Date().toISOString().split("T")[0],
+
       totalAmount: editableData.totalAmount,
+
       category: selectedCategory,
+
       receiptImageUri: imageUri ?? undefined,
+
       createdAt: new Date().toISOString(),
     };
 
@@ -201,8 +207,6 @@ export default function ReceiptConfirmScreen() {
           },
         },
       ]);
-
-      console.log("💾 SAVED EXPENSE:", expense);
     } catch (error) {
       Alert.alert("저장 실패", "지출 내역을 저장하지 못했어.");
     }
