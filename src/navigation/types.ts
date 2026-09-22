@@ -8,4 +8,7 @@ export type MainTabParamList = {
 export type RootStackParamList = {
   MainTabs: NavigatorScreenParams<MainTabParamList>;
   ReceiptConfirm: undefined;
+  ExpenseDetail: {
+    expenseId: string;
+  };
 };

@@ -39,6 +39,20 @@ export async function getExpenses(): Promise<Expense[]> {
   }
 }
 
+// -----------------------------
+// 단건 조회 함수 추가
+// -----------------------------
+export async function getExpenseById(id: string): Promise<Expense | null> {
+  try {
+    const expenses = await getExpenses();
+    const found = expenses.find((item) => item.id === id);
+    return found || null;
+  } catch (error) {
+    console.error("지출 내역 단건 불러오기 실패:", error);
+    return null;
+  }
+}
+
 export async function saveExpense(expense: Expense): Promise<void> {
   try {
     const expenses = await getExpenses();
@@ -67,6 +81,24 @@ export async function deleteExpense(id: string): Promise<void> {
     );
   } catch (error) {
     console.error("지출 내역 삭제 실패:", error);
+    throw error;
+  }
+}
+
+export async function updateExpense(expense: Expense): Promise<void> {
+  try {
+    const expenses = await getExpenses();
+
+    const updatedExpenses = expenses.map((item) =>
+      item.id === expense.id ? expense : item,
+    );
+
+    await AsyncStorage.setItem(
+      EXPENSE_STORAGE_KEY,
+      JSON.stringify(updatedExpenses),
+    );
+  } catch (error) {
+    console.error("지출 내역 수정 실패:", error);
     throw error;
   }
 }

@@ -10,6 +10,7 @@ import HomeScreen from "../screens/Home/HomeScreen";
 import ReceiptConfirmScreen from "../screens/ReceiptConfirm/ReceiptConfirmScreen";
 import ExpenseListScreen from "../screens/ExpenseStoarage/ExpenseListScreen";
 import { Ionicons } from "@expo/vector-icons";
+import ExpenseDetailScreen from "../screens/Expense/ExpenseDetailScreen";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const MainTab = createBottomTabNavigator<MainTabParamList>();
@@ -97,6 +98,14 @@ export default function AppNavigator() {
             fontFamily: theme.typography.fontFamily.bold,
             color: theme.colors.textPrimary,
           },
+        }}
+      />
+      <RootStack.Screen
+        name="ExpenseDetail"
+        component={ExpenseDetailScreen}
+        options={{
+          title: "",
+          headerShadowVisible: false,
         }}
       />
     </RootStack.Navigator>

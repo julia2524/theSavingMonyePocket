@@ -343,6 +343,7 @@ const EmptyTitle = styled.Text`
   color: ${({ theme }) => theme.colors.textPrimary};
   font-size: ${({ theme }) => theme.typography.fontSize.md}px;
   font-family: ${({ theme }) => theme.typography.fontFamily.semiBold};
+  text-align: center;
 `;
 
 const EmptyText = styled.Text`

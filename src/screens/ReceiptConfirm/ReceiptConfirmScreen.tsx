@@ -23,6 +23,7 @@ import { ExpenseCategory, saveExpense } from "../../data/expenseStorage";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
+import { CATEGORY_OPTIONS } from "../Expense/ExpenseDetailScreen";
 
 export default function ReceiptConfirmScreen() {
   const navigation =
@@ -197,7 +198,7 @@ export default function ReceiptConfirmScreen() {
     try {
       await saveExpense(expense);
 
-      Alert.alert("저장 완료", "지출 내역이 기록되었어!", [
+      Alert.alert("저장 완료", "지출 내역이 기록되었습니다.", [
         {
           text: "확인",
           onPress: () => {
@@ -208,7 +209,7 @@ export default function ReceiptConfirmScreen() {
         },
       ]);
     } catch (error) {
-      Alert.alert("저장 실패", "지출 내역을 저장하지 못했어.");
+      Alert.alert("저장 실패", "지출 내역을 저장하지 못했습니다.");
     }
   };
 
@@ -267,30 +268,15 @@ export default function ReceiptConfirmScreen() {
                   <Field>
                     <Label>카테고리</Label>
                     <CategoryList>
-                      <CategoryChip
-                        category="food"
-                        label="식비"
-                        selected={selectedCategory === "food"}
-                        onPress={() => setSelectedCategory("food")}
-                      />
-                      <CategoryChip
-                        category="shopping"
-                        label="쇼핑"
-                        selected={selectedCategory === "shopping"}
-                        onPress={() => setSelectedCategory("shopping")}
-                      />
-                      <CategoryChip
-                        category="transport"
-                        label="교통"
-                        selected={selectedCategory === "transport"}
-                        onPress={() => setSelectedCategory("transport")}
-                      />
-                      <CategoryChip
-                        category="cafe"
-                        label="카페"
-                        selected={selectedCategory === "cafe"}
-                        onPress={() => setSelectedCategory("cafe")}
-                      />
+                      {CATEGORY_OPTIONS.map((item) => (
+                        <CategoryChip
+                          key={item.category}
+                          category={item.category}
+                          label={item.label}
+                          selected={selectedCategory === item.category}
+                          onPress={() => setSelectedCategory(item.category)}
+                        />
+                      ))}
                     </CategoryList>
                   </Field>
                   {/* 날짜 - AppInput 적용 */}
